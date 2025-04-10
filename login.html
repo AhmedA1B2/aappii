@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+form {border: 3px solid #f1f1f1;}
+
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.container {
+  padding: 16px;
+}
+
+.box {
+    width: 50%;
+    margin: auto;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Login Form</h2>
+
+    <form id="loginForm">
+      <div class="container">
+        <label for="uname"><b>Username</b></label>
+        <input id="name" type="text" placeholder="Enter Username" name="uname" required>
+
+        <label for="psw"><b>Password</b></label>
+        <input id="pass" type="password" placeholder="Enter Password" name="psw" required>
+            
+        <button id="log" type="submit">Login</button>
+      </div>
+    </form>
+</div>
+
+<script>
+    console.log(localStorage.getItem("user"));
+
+document.getElementById("log").addEventListener("click", async function(event) {
+    event.preventDefault(); // منع إعادة تحميل الصفحة
+
+    let name_t = document.getElementById("name").value;
+    let pass_t = document.getElementById("pass").value;
+
+    try {
+        let response = await fetch("http://localhost//%E2%80%8F%E2%80%8Fsysapi/auth/login.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `name_t=${encodeURIComponent(name_t)}&pass_t=${encodeURIComponent(pass_t)}`
+        });
+
+        let result = await response.json(); 
+
+      //  console.log("استجابة الخادم:", result); // طباعة الاستجابة لفحصها
+
+        if (result.status === "success" && result.data.length > 0) {
+
+            let userData = result.data[0]; // استخراج بيانات المستخدم
+
+            // حفظ بيانات المستخدم في localStorage
+            localStorage.setItem("user", JSON.stringify(userData));
+
+            window.location.replace("http://localhost:8000/index");
+            
+
+         //   console.log("تم العثور على بيانات:", userData);
+        } else {
+
+            alert("البيانات المدخله خاطئه");
+
+          //  console.log("لم يتم العثور على بيانات!", result.message);
+        }
+    } catch (error) {
+        console.error("خطأ في الاتصال بالخادم:", error);
+    }
+});
+
+</script>
+
+</body>
+</html>

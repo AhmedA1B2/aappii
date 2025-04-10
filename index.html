@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="codemirror-5.65.18/lib/codemirror.css">
+    <link rel="stylesheet" href="codemirror-5.65.18/theme/dracula.css">
+    <script src="codemirror-5.65.18/lib/codemirror.js"></script>
+    <script src="codemirror-5.65.18/mode/clike/clike.js"></script>
+    <script src="codemirror-5.65.18/addon/edit/closebrackets.js"></script>
+    <script src="codemirror-5.65.18/mode/python/python.js"></script>
+</head>
+<body>
+
+    <div class="row m-3">
+        <div class="col">
+            <div class="d-flex justify-content-between mb-2 bg-dark rounded p-2">
+                <div class="col-auto w-25">
+                    <label class="visually-hidden" for="autoSizingSelect">Preference</label>
+                    <select class="form-select" id="autoSizingSelect">
+                      <option selected>Choose...</option>
+                      <option value="Java">Java</option>
+                      <option value="CPP">CPP</option>
+                      <option value="Python">Python</option>
+                    </select>
+                  </div>
+                  <div class="col-auto w-25">
+                    <label class="visually-hidden" for="qnum">Preference</label>
+                    <select class="form-select" id="qnum">
+                      <option selected>Choose...</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                      <option value="6">6</option>
+                      <option value="7">7</option>
+                      <option value="8">8</option>
+                      <option value="9">9</option>
+                      <option value="10">10</option>
+                      <option value="11">11</option>
+                      <option value="12">12</option>
+                      <option value="13">13</option>
+                    </select>
+                  </div>
+                  <div>
+                    <button type="button" id="run" class="btn btn-success"><i class="bi bi-play-fill"></i></button>
+                  </div>
+            </div>
+          <textarea type="text" id="editor" class="form-control" aria-label="First name"></textarea>
+        </div>
+        <div class="col d-flex flex-column rounded bg-dark px-4">
+            <div class="h-50">
+                <label for="try" class="text-light mt-4 mb-2">Try</label>
+                <textarea type="text" id="try" class="form-control h-75" aria-label="try"></textarea>
+            </div>
+        </div>
+    </div>
+    
+</body>
+
+<script>
+let userData = localStorage.getItem("user");
+
+//console.log("البيانات المسترجعة من LocalStorage:", userData); // التحقق من القيم في الكونسول
+
+if (userData) {
+    let user = JSON.parse(userData); // تحويل النص إلى كائن JSON
+    
+} else {
+    console.warn("لم يتم العثور على بيانات المستخدم! إعادة التوجيه إلى تسجيل الدخول...");
+    setTimeout(() => {
+        window.location.replace("http://localhost:8000/");
+    }, 1000); // انتظار 1 ثانية قبل إعادة التوجيه
+}
+
+function logout() {
+    localStorage.removeItem("user"); // حذف بيانات المستخدم
+    window.location.replace("http://localhost:8000/"); // العودة لصفحة تسجيل الدخول
+}
+</script>
+<!--
+    ####################################################################################
+-->
+<script>
+
+    var run = document.getElementById("run");
+    var tryy = document.getElementById("try");
+    var inputValue;
+    var outputValue;
+    var code;
+
+    var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+        mode: "text/x-c++src",
+        theme: "dracula",
+        lineNumbers: true,
+        autoCloseBrackets: true,
+    });
+
+    var width = window.innerWidth;
+    var w = 0.7 * width;
+    var h = "500";
+    editor.setSize(w, h);
+
+    var option = document.getElementById("autoSizingSelect");
+
+    option.addEventListener("change", function() {
+        if (option.value == "Java") {
+            editor.setOption("mode", "text/x-java");
+        } else if (option.value == "Python") {
+            editor.setOption("mode", "text/x-python");
+        } else if (option.value == "CPP") {
+            editor.setOption("mode", "text/x-c++src");
+        }
+    });
+
+    var optionq = document.getElementById("qnum");
+
+    optionq.addEventListener("change", async function() {
+        let num_q = optionq.value; // احصل على رقم السؤال المختار من القائمة
+
+        let response = await fetch("http://localhost/%E2%80%8F%E2%80%8Fsysapi/rank/try.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `num_q=${num_q}`
+        });
+
+        let result = await response.json();
+
+        if (result.status === "success" && result.data.length > 0) {
+            let questionData = result.data[0];
+            inputValue = questionData.input_q ? questionData.input_q : "لا يوجد بيانات";
+            outputValue = questionData.output_q ? questionData.output_q : "لا يوجد بيانات";
+        } else {
+            console.log("لم يتم العثور على بيانات!");
+        }
+    });
+
+    run.addEventListener("click", async function() {
+    code = {
+        code: editor.getValue(),
+        input: inputValue,
+        lang: option.value
+    };
+
+    var oData = await fetch("http://localhost:8000/compile", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(code)
+    });
+
+    var d = await oData.json();
+
+    // تأكد من أن القيم ليست null أو undefined قبل تطبيق trim()
+    outputValue = (outputValue && typeof outputValue === "string") ? outputValue.trim().replace(/\s+/g, '') : "";
+    let resultOutput = (d.output && typeof d.output === "string") ? d.output.trim().replace(/\s+/g, '') : "";
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+let userData = localStorage.getItem("user");
+
+let user = JSON.parse(userData); 
+
+
+    if (outputValue === resultOutput) {
+        tryy.value = "الكود صحيح";
+        try {
+        let response = await fetch("http://localhost//%E2%80%8F%E2%80%8Fsysapi/rank/check_answer.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `name_t=${user.name_t}&num_q=${optionq.value}`
+        });
+
+        let result = await response.json(); 
+
+        if (result.status === "success") {
+
+            alert("نجحت العمليه");
+            
+
+         
+        } else if (result.status === "error0") {
+
+            alert("فشلت العمليه 0");
+
+        }else if (result.status === "error1") {
+
+            alert("فشلت العمليه 1");
+
+        } else if (result.status === "error2") {
+
+            alert("فشلت العمليه 2");
+
+        }
+    } catch (error) {
+       // alert("خطأ في الاتصال بالخادم:", error);
+    }
+    } else {
+        tryy.value = "الكود خاطئ";
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////npx nodemon Api.js////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    console.log("/////////////////");
+    console.log(outputValue);
+    console.log("/////////////////");
+    console.log(resultOutput);
+});
+
+
+</script>
+
+</html>
+
