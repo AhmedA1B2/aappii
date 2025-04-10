@@ -74,13 +74,13 @@ if (userData) {
 } else {
     console.warn("لم يتم العثور على بيانات المستخدم! إعادة التوجيه إلى تسجيل الدخول...");
     setTimeout(() => {
-        window.location.replace("http://localhost:8000/");
-    }, 1000); // انتظار 1 ثانية قبل إعادة التوجيه
+        window.location.replace("http://test-system.42web.io/codemirror/login.html");
+    }, 0); // انتظار 0 ثانية قبل إعادة التوجيه
 }
 
 function logout() {
     localStorage.removeItem("user"); // حذف بيانات المستخدم
-    window.location.replace("http://localhost:8000/"); // العودة لصفحة تسجيل الدخول
+    window.location.replace("http://test-system.42web.io/codemirror/login.html"); // العودة لصفحة تسجيل الدخول
 }
 </script>
 <!--
@@ -123,7 +123,7 @@ function logout() {
     optionq.addEventListener("change", async function() {
         let num_q = optionq.value; // احصل على رقم السؤال المختار من القائمة
 
-        let response = await fetch("http://localhost/%E2%80%8F%E2%80%8Fsysapi/rank/try.php", {
+        let response = await fetch("http://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/rank/try.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -173,7 +173,7 @@ let user = JSON.parse(userData);
     if (outputValue === resultOutput) {
         tryy.value = "الكود صحيح";
         try {
-        let response = await fetch("http://localhost//%E2%80%8F%E2%80%8Fsysapi/rank/check_answer.php", {
+        let response = await fetch("http://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/rank/check_answer.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -222,10 +222,5 @@ let user = JSON.parse(userData);
 
 
 </script>
-
-<!--
-
-git remote add origin https://github.com/AhmedA1B2/aappii.git
--->
 
 </html>
