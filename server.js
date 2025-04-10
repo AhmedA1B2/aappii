@@ -7,13 +7,13 @@ const options={ stats: true }
 compiler.init(options)
 
 app.use(bodyP.json())
-app.use("/codemirror-5.65.18",express.static("C:/Users/MSII/Desktop/برمجيات/codemirror/codemirror-5.65.18"))
+app.use("/codemirror-5.65.18",express.static("/codemirror-5.65.18"))
 app.get("/",function(req,res){
-    res.sendFile("C:/Users/MSII/Desktop/برمجيات/codemirror/login.html")
+    res.sendFile("/login.html")
 })
 
 app.get("/index", function (req, res) {
-    res.sendFile("C:/Users/MSII/Desktop/برمجيات/codemirror/index.html");
+    res.sendFile("/index.html");
 });
 
 app.post("/compile",function(req,res){
