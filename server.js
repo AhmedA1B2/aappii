@@ -3,33 +3,31 @@ const app = express();
 const bodyP = require("body-parser");
 const compiler = require("compilex");
 const path = require("path");
-const options = { stats: true };
 
+const options = { stats: true };
 compiler.init(options);
 
 app.use(bodyP.json());
 
-// ⬅️ هذا يخلي كل الملفات الثابتة تشتغل (HTML, CSS, JS من مجلد public)
-app.use(express.static(path.join(__dirname, "public")));
+// Serve CodeMirror static files
+app.use("/codemirror-5.65.18", express.static(path.join(__dirname, "codemirror-5.65.18")));
 
-// ⬅️ نحدد ملفات HTML باستخدام المسار الصحيح
 app.get("/", function (req, res) {
-    res.sendFile(path.join(__dirname, "public", "login.html"));
+    res.sendFile(path.join(__dirname, "login.html"));
 });
 
 app.get("/index", function (req, res) {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// خدمة كود الكومبايل
 app.post("/compile", function (req, res) {
-    const code = req.body.code;
-    const input = req.body.input;
-    const lang = req.body.lang;
+    var code = req.body.code;
+    var input = req.body.input;
+    var lang = req.body.lang;
 
     try {
-        if (lang === "CPP") {
-            const envData = { OS: "windows", cmd: "g++", options: { timeout: 10000 } };
+        if (lang == "CPP") {
+            var envData = { OS: "windows", cmd: "g++", options: { timeout: 10000 } };
             if (!input) {
                 compiler.compileCPP(envData, code, function (data) {
                     res.send(data);
@@ -39,8 +37,8 @@ app.post("/compile", function (req, res) {
                     res.send(data);
                 });
             }
-        } else if (lang === "Java") {
-            const envData = { OS: "windows" };
+        } else if (lang == "Java") {
+            var envData = { OS: "windows" };
             if (!input) {
                 compiler.compileJava(envData, code, function (data) {
                     res.send(data);
@@ -50,8 +48,8 @@ app.post("/compile", function (req, res) {
                     res.send(data);
                 });
             }
-        } else if (lang === "Python") {
-            const envData = { OS: "windows" };
+        } else if (lang == "Python") {
+            var envData = { OS: "windows" };
             if (!input) {
                 compiler.compilePython(envData, code, function (data) {
                     res.send(data);
