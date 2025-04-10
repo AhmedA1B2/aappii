@@ -67,7 +67,7 @@ document.getElementById("log").addEventListener("click", async function(event) {
     let pass_t = document.getElementById("pass").value;
 
     try {
-        let response = await fetch("http://localhost//%E2%80%8F%E2%80%8Fsysapi/auth/login.php", {
+        let response = await fetch("http://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -86,7 +86,7 @@ document.getElementById("log").addEventListener("click", async function(event) {
             // حفظ بيانات المستخدم في localStorage
             localStorage.setItem("user", JSON.stringify(userData));
 
-            window.location.replace("http://localhost:8000/index");
+            window.location.replace("http://test-system.42web.io/codemirror/index.html");
             
 
          //   console.log("تم العثور على بيانات:", userData);
