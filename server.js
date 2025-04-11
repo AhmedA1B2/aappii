@@ -24,22 +24,32 @@ app.get("/index", (req, res) => {
 });
 
 // ✅ Proxy لحل مشكلة CORS
+const https = require("https"); // أضف هذا في أعلى الملف إن لم يكن موجودًا
+
 app.post("/proxy-login", async (req, res) => {
     try {
-        const response = await axios.post("https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
+        const agent = new https.Agent({  
+            rejectUnauthorized: false  // ⚠️ تجاوز التحقق من SSL (فقط أثناء التطوير)
+        });
+
+        const response = await axios.post(
+            "https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
             new URLSearchParams(req.body).toString(),
             {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
-                }
+                },
+                httpsAgent: agent  // استخدم وكيل HTTPS المعدل
             }
         );
+
         res.json(response.data);
     } catch (err) {
         console.error("Proxy error:", err.message);
         res.status(500).send({ error: "Proxy error", details: err.message });
     }
 });
+
 
 app.post("/compile", function(req, res) {
     var code = req.body.code;
