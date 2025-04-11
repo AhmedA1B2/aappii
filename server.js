@@ -1,63 +1,71 @@
 const express = require("express");
-const app = express();
 const bodyP = require("body-parser");
 const compiler = require("compilex");
+const axios = require("axios");
 const path = require("path");
 
+const app = express();
 const options = { stats: true };
 compiler.init(options);
 
 app.use(bodyP.json());
+app.use(bodyP.urlencoded({ extended: true }));
 
-// Serve CodeMirror static files
+// ⬅️ تعديل مهم: تحديد المسار بشكل نسبي
 app.use("/codemirror-5.65.18", express.static(path.join(__dirname, "codemirror-5.65.18")));
+app.use(express.static(__dirname)); // للسماح بتحميل login.html وغيره
 
-app.get("/", function (req, res) {
+app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "login.html"));
 });
 
-app.get("/index", function (req, res) {
+app.get("/index", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.post("/compile", function (req, res) {
+// ✅ Proxy لحل مشكلة CORS
+app.post("/proxy-login", async (req, res) => {
+    try {
+        const response = await axios.post("https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
+            new URLSearchParams(req.body).toString(),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            }
+        );
+        res.json(response.data);
+    } catch (err) {
+        console.error("Proxy error:", err.message);
+        res.status(500).send({ error: "Proxy error", details: err.message });
+    }
+});
+
+app.post("/compile", function(req, res) {
     var code = req.body.code;
     var input = req.body.input;
     var lang = req.body.lang;
 
     try {
-        if (lang == "CPP") {
-            var envData = { OS: "windows", cmd: "g++", options: { timeout: 10000 } };
+        const envData = { OS: "windows", options: { timeout: 10000 } };
+
+        if (lang === "CPP") {
             if (!input) {
-                compiler.compileCPP(envData, code, function (data) {
-                    res.send(data);
-                });
+                compiler.compileCPP(envData, code, data => res.send(data));
             } else {
-                compiler.compileCPPWithInput(envData, code, input, function (data) {
-                    res.send(data);
-                });
+                compiler.compileCPPWithInput(envData, code, input, data => res.send(data));
             }
-        } else if (lang == "Java") {
-            var envData = { OS: "windows" };
+        } else if (lang === "Java") {
             if (!input) {
-                compiler.compileJava(envData, code, function (data) {
-                    res.send(data);
-                });
+                compiler.compileJava(envData, code, data => res.send(data));
             } else {
-                compiler.compileJavaWithInput(envData, code, input, function (data) {
-                    res.send(data);
-                });
+                compiler.compileJavaWithInput(envData, code, input, data => res.send(data));
             }
-        } else if (lang == "Python") {
-            var envData = { OS: "windows" };
+        } else if (lang === "Python") {
             if (!input) {
-                compiler.compilePython(envData, code, function (data) {
-                    res.send(data);
-                });
+                compiler.compilePython(envData, code, data => res.send(data));
             } else {
-                compiler.compilePythonWithInput(envData, code, input, function (data) {
-                    res.send(data);
-                });
+                compiler.compilePythonWithInput(envData, code, input, data => res.send(data));
             }
         }
     } catch (e) {
