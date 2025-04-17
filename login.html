@@ -68,13 +68,14 @@ document.getElementById("log").addEventListener("click", async function(event) {
 
     try {
         // بدال الرابط المباشر لـ PHP
-let response = await fetch("https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php", {
+let response = await fetch("https://aappii-e052.onrender.com/proxy-login", {
     method: "POST",
     headers: {
         "Content-Type": "application/x-www-form-urlencoded"
     },
     body: `name_t=${encodeURIComponent(name_t)}&pass_t=${encodeURIComponent(pass_t)}`
 });
+
 
 
         let result = await response.json(); 
