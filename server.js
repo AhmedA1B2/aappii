@@ -26,29 +26,37 @@ app.get("/index", (req, res) => {
 // ✅ Proxy لحل مشكلة CORS
 const https = require("https"); // أضف هذا في أعلى الملف إن لم يكن موجودًا
 
+const axios = require("axios");
+const tough = require("tough-cookie");
+const { wrapper } = require("axios-cookiejar-support");
+
+const jar = new tough.CookieJar();
+const client = wrapper(axios.create({ jar }));
+
 app.post("/proxy-login", async (req, res) => {
-    try {
-        const agent = new https.Agent({  
-            rejectUnauthorized: false  // ⚠️ تجاوز التحقق من SSL (فقط أثناء التطوير)
-        });
+  try {
+    // 🔐 الخطوة الأولى: الحصول على الـ cookie من السيرفر
+    await client.get("https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php");
 
-        const response = await axios.post(
-            "https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
-            new URLSearchParams(req.body).toString(),
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                httpsAgent: agent  // استخدم وكيل HTTPS المعدل
-            }
-        );
+    // 📤 الخطوة الثانية: إرسال بيانات تسجيل الدخول
+    const response = await client.post(
+      "https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
+      new URLSearchParams(req.body).toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      }
+    );
 
-        res.json(response.data);
-    } catch (err) {
-        console.error("Proxy error:", err.message);
-        res.status(500).send({ error: "Proxy error", details: err.message });
-    }
+    // ✅ إرسال الاستجابة للمتصفح
+    res.json(response.data);
+  } catch (err) {
+    console.error("Proxy error:", err.message);
+    res.status(500).send({ error: "Proxy error", details: err.message });
+  }
 });
+
 
 
 app.post("/compile", function(req, res) {
