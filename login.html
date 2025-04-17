@@ -67,14 +67,15 @@ document.getElementById("log").addEventListener("click", async function(event) {
     let pass_t = document.getElementById("pass").value;
 
     try {
-
-      let response = await fetch("https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php", {
+        // بدال الرابط المباشر لـ PHP
+let response = await fetch("https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php", {
     method: "POST",
     headers: {
         "Content-Type": "application/x-www-form-urlencoded"
     },
     body: `name_t=${encodeURIComponent(name_t)}&pass_t=${encodeURIComponent(pass_t)}`
 });
+
 
         let result = await response.json(); 
 
@@ -87,7 +88,7 @@ document.getElementById("log").addEventListener("click", async function(event) {
             // حفظ بيانات المستخدم في localStorage
             localStorage.setItem("user", JSON.stringify(userData));
 
-            window.location.replace("https://aappii-e052.onrender.com/index.html");
+            window.location.replace("https://test-system.42web.io/codemirror/index.html");
             
 
          //   console.log("تم العثور على بيانات:", userData);
@@ -106,4 +107,3 @@ document.getElementById("log").addEventListener("click", async function(event) {
 
 </body>
 </html>
-
