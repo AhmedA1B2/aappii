@@ -1,28 +1,22 @@
 const express = require("express");
 const bodyP = require("body-parser");
 const compiler = require("compilex");
-const axios = require("axios");
 const path = require("path");
 const https = require("https");
 
-const tough = require("tough-cookie");
-const { wrapper } = require("axios-cookiejar-support");
-
-const jar = new tough.CookieJar();
-const client = wrapper(axios.create({ jar }));
-
+// إعداد Compilex
 const app = express();
 const options = { stats: true };
 compiler.init(options);
 
+// إعداد body-parser
 app.use(bodyP.json());
 app.use(bodyP.urlencoded({ extended: true }));
 
-// 🧱 تحميل الملفات الثابتة
+// ملفات الواجهة
 app.use("/codemirror-5.65.18", express.static(path.join(__dirname, "codemirror-5.65.18")));
 app.use(express.static(__dirname));
 
-// 🏠 صفحة البداية
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "login.html"));
 });
@@ -31,31 +25,47 @@ app.get("/index", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// 🔐 بروكسي لتسجيل الدخول (تجاوز حماية الجافاسكربت على السيرفر)
+// ✅ إعداد proxy مع تجاوز التحقق من شهادة SSL
+
+const axios = require("axios");
+const tough = require("tough-cookie");
+const { wrapper } = require("axios-cookiejar-support");
+
+const jar = new tough.CookieJar();
+const client = wrapper(axios.create({ jar }));
+
 app.post("/proxy-login", async (req, res) => {
     try {
-        // 🥠 الخطوة الأولى: جلب الـ cookie الضروري من السيرفر
-        await client.get("https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php");
+        console.log("🔐 طلب تسجيل الدخول:", req.body);
 
-        // 📤 الخطوة الثانية: إرسال بيانات تسجيل الدخول
+        // جلب الكوكي من السيرفر الأصلي
+        await client.get(
+            "https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
+            {
+                httpsAgent: new https.Agent({ rejectUnauthorized: false })
+            }
+        );
+
+        // إرسال بيانات تسجيل الدخول
         const response = await client.post(
             "https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
             new URLSearchParams(req.body).toString(),
             {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
-                }
+                },
+                httpsAgent: new https.Agent({ rejectUnauthorized: false })
             }
         );
 
         res.json(response.data);
     } catch (err) {
-        console.error("Proxy error:", err.message);
+        console.error("❌ Proxy error:", err.message);
         res.status(500).send({ error: "Proxy error", details: err.message });
     }
 });
 
-// 🧠 تجميع الأكواد (باستخدام Compilex)
+// ✅ API لتشغيل الكود (compilex)
 app.post("/compile", function(req, res) {
     var code = req.body.code;
     var input = req.body.input;
@@ -89,7 +99,7 @@ app.post("/compile", function(req, res) {
     }
 });
 
-// 🚀 بدء السيرفر
+// تشغيل السيرفر
 app.listen(8000, () => {
-    console.log("Server running on port 8000");
+    console.log("🚀 Server running on port 8000");
 });
