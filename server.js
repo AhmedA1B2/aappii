@@ -40,7 +40,7 @@ app.post("/proxy-login", async (req, res) => {
 
         // جلب الكوكي من السيرفر الأصلي
         await client.get(
-            "https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
+            "https://aappii-e052.onrender.com/‏‏sysapi/auth/login.php",
             {
                 httpsAgent: new https.Agent({ rejectUnauthorized: false })
             }
@@ -48,7 +48,7 @@ app.post("/proxy-login", async (req, res) => {
 
         // إرسال بيانات تسجيل الدخول
         const response = await client.post(
-            "https://test-system.42web.io/s4y4mAuagw22dbw84u84y4o2/auth/login.php",
+            "https://aappii-e052.onrender.com/‏‏sysapi/auth/login.php",
             new URLSearchParams(req.body).toString(),
             {
                 headers: {
