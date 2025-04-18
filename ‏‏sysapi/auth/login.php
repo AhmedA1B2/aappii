@@ -5,10 +5,10 @@ header("Access-Control-Allow-Origin: *"); // السماح لجميع النطا�
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-include "../connect.php"; 
+include "../connectcopy.php"; 
 
-$name_t = filterRequest("name_t");
-$pass_t = filterRequest("pass_t");
+$name_t = isset($_POST['name_t']) ? $_POST['name_t'] : null;
+$pass_t = isset($_POST['pass_t']) ? $_POST['pass_t'] : null;
 
 $stmt = $con->prepare("SELECT * FROM `teams` WHERE `name_t` = ? AND `pass_t` = ?"); 
 $stmt->execute([$name_t, $pass_t]);
