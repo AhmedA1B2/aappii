@@ -1,7 +1,7 @@
 <?php
-$dsn = "mysql:host=localhost;dbname=quizsystem";
-$user = "root";
-$pass = "";
+$dsn = "mysql:host=sql206.infinityfree.com;dbname=if0_38685421_q_sys_db";
+$user = "if0_38685421";
+$pass = "N9tzqTEbvXfqy";
 $option = array(
    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES UTF8"
 );
